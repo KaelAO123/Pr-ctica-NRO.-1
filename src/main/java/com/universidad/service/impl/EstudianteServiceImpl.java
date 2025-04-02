@@ -38,6 +38,43 @@ public class EstudianteServiceImpl implements IEstudianteService { // Define la 
         return estudiantesDTO; // Retorna la lista de EstudianteDTO
     }
 
+    @Override
+    public EstudianteDTO guardarEstudiante(EstudianteDTO estudianteDTO) { // Método para guardar un EstudianteDTO
+        Estudiante estudiante = convertToEntity(estudianteDTO); // Convierte el EstudianteDTO a Estudiante
+        Estudiante estudianteGuardado = estudianteRepository.save(estudiante); // Guarda el estudiante en el repositorio
+        return convertToDTO(estudianteGuardado); // Convierte el estudiante guardado a EstudianteDTO y lo retorna
+    }
+    
+    @Override
+    public EstudianteDTO obtenerEstudiantePorID(Long id) { // Método para obtener un EstudianteDTO por su ID
+        Estudiante estudiante = estudianteRepository.findAll().stream() // Obtiene todos los estudiantes y los convierte a un stream
+                .filter(e -> e.getId().equals(id)) // Filtra el stream para encontrar el estudiante con el ID dado
+                .findFirst() // Toma el primer resultado del filtro
+                .orElse(null); // Si no se encuentra, retorna null
+        return convertToDTO(estudiante); // Convierte el estudiante a EstudianteDTO y lo retorna
+    }
+
+    @Override
+    public EstudianteDTO actualizarEstudiantePorID(Long id, EstudianteDTO estudianteDTO) { // Método para actualizar un EstudianteDTO por su ID
+        Estudiante estudianteExistente = estudianteRepository.findAll().stream() // Obtiene todos los estudiantes y los convierte a un stream
+                .filter(e -> e.getId().equals(id)) // Filtra el stream para encontrar el estudiante con el ID dado
+                .findFirst() // Toma el primer resultado del filtro
+                .orElse(null); // Si no se encuentra, retorna null
+        
+        if (estudianteExistente != null) { // Si se encuentra el estudiante
+            Estudiante estudianteActualizado = convertToEntity(estudianteDTO); // Convierte el EstudianteDTO a Estudiante
+            estudianteActualizado.setId(id); // Asigna el ID al estudiante actualizado
+            estudianteRepository.save(estudianteActualizado); // Guarda el estudiante actualizado en el repositorio
+            return convertToDTO(estudianteActualizado); // Convierte el estudiante actualizado a EstudianteDTO y lo retorna
+        }
+        return null; // Si no se encuentra el estudiante, retorna null
+    }
+
+    @Override
+    public void eliminarEstudiantePorID(Long id) { // Método para eliminar un EstudianteDTO por su ID
+        estudianteRepository.deleteById(id); // Llama al método deleteById del repositorio para eliminar el estudiante
+    }
+
     // Método auxiliar para convertir entidad a DTO
     private EstudianteDTO convertToDTO(Estudiante estudiante) { // Método para convertir un Estudiante a EstudianteDTO
         return EstudianteDTO.builder() // Usa el patrón builder para crear un EstudianteDTO
